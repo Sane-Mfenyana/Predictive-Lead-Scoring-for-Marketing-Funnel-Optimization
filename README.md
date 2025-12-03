@@ -112,3 +112,47 @@ A manual, reactive approach leads to inefficient spend and missed opportunities.
 *   Significant engagement (call duration) is strongly correlated with conversion.
 
 ---
+
+## Step 3: Business Context & Funnel Definition
+
+**Objective:** Translate the dataset and initial findings into a structured business framework. Define the marketing funnel stages, key performance indicators (KPIs), and the analytical approach for the project.
+
+**Actions Taken:**
+
+1.  **Funnel Stage Definition:** Mapped the customer journey to three measurable stages:
+    *   **Stage 1 - Contacted:** Lead was contacted (`contact` is not null).
+    *   **Stage 2 - Engaged:** Call duration lasted **5 minutes or more** (`duration >= 300` seconds).
+    *   **Stage 3 - Converted:** Lead subscribed to the term deposit (`y = true`).
+
+2.  **Funnel Quantification:** Executed SQL to calculate volumes and conversion rates between each stage.
+    ```sql
+    WITH funnel AS (
+      SELECT
+        COUNT(*) AS total_contacted,
+        COUNTIF(duration >= 300) AS engaged,
+        COUNTIF(y = true) AS converted
+      FROM `bank_marketing.bank_additional_full`
+    )
+    SELECT 
+      total_contacted,
+      engaged,
+      converted,
+      ROUND(engaged * 100.0 / total_contacted, 2) AS contact_to_engage_rate,
+      ROUND(converted * 100.0 / engaged, 2) AS engage_to_convert_rate,
+      ROUND(converted * 100.0 / total_contacted, 2) AS overall_conversion_rate
+    FROM funnel;
+    ```
+    *   **Results:** 41,188 contacted → 11,250 engaged (27.31%) → 4,640 converted (41.24%). Overall conversion rate: 11.27%.
+
+3.  **KPI Establishment:** Defined four core metrics for ongoing performance tracking:
+    *   Engagement Rate, Engaged Conversion Rate, Overall Conversion Rate, and Average Conversion Duration.
+
+4.  **Modeling Strategy Formulation:** Adopted a dual-model approach to serve both analytical and operational needs:
+    *   **Diagnostic Model:** Includes `duration` to profile successful conversions and understand key drivers.
+    *   **Operational Model:** Excludes `duration` (unknown pre-call) to provide a true lead score for prioritizing marketing calls.
+
+**Tools:** BigQuery (SQL), Business Analysis.
+
+**Key Insight:** The largest funnel drop-off occurs at the engagement stage (only 27% of calls last >5 minutes). Improving this is the primary lever for increasing conversions.
+
+---
