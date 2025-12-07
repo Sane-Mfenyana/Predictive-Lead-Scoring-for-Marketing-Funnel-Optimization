@@ -329,3 +329,86 @@ A manual, reactive approach leads to inefficient spend and missed opportunities.
 4.  **Stratified sampling** is crucial for maintaining class distribution in train/test splits, especially with imbalanced data.
 
 ---
+## Step 6: Predictive Model Development (Python)
+
+**Objective:** Build, train, and evaluate machine learning models to predict lead conversion probability, implementing both operational and diagnostic models as defined in the project strategy.
+
+**Actions Taken:**
+
+1.  **Model Selection & Pipeline Construction:** Implemented a Logistic Regression model within a scikit-learn pipeline to handle categorical encoding, feature scaling, and model training in a single, reproducible workflow.
+    ```python
+    from sklearn.pipeline import Pipeline
+    from sklearn.compose import ColumnTransformer
+    from sklearn.preprocessing import OneHotEncoder, StandardScaler
+    from sklearn.linear_model import LogisticRegression
+
+    categorical_cols = X_train_op.select_dtypes(include=['object']).columns.tolist()
+    preprocessor = ColumnTransformer(
+        transformers=[('cat', OneHotEncoder(handle_unknown='ignore'), categorical_cols)],
+        remainder='passthrough'
+    )
+    model_pipeline = Pipeline(steps=[
+        ('preprocessor', preprocessor),
+        ('scaler', StandardScaler()),
+        ('classifier', LogisticRegression(random_state=42, max_iter=1000))
+    ])
+    ```
+
+2.  **Operational Model Training:** Trained the primary model using only features known *before* a sales call (excluding `duration`).
+    ```python
+    model_pipeline.fit(X_train_op, y_train_op)
+    ```
+    *   **Result:** Model trained on 32,950 samples using 20 original features (expanded to 61 after one-hot encoding).
+
+3.  **Model Evaluation & Performance:** Evaluated the model on unseen test data, focusing on metrics suitable for imbalanced classification.
+    ```python
+    from sklearn.metrics import roc_auc_score, classification_report
+    y_pred_proba = model_pipeline.predict_proba(X_test_op)[:, 1]
+    auc_score = roc_auc_score(y_test_op, y_pred_proba)
+    print(classification_report(y_test_op, y_pred))
+    ```
+    *   **Result:** **ROC-AUC = 0.801 (Very Good)**. Precision = 69%, Recall = 22% at the default 0.5 threshold.
+
+4.  **Precision-Recall Trade-off Analysis:** Analyzed the impact of different probability thresholds to support a tiered business strategy.
+    ```python
+    from sklearn.metrics import precision_recall_curve
+    precisions, recalls, thresholds = precision_recall_curve(y_test_op, y_pred_proba)
+    ```
+    *   **Strategy Implemented:**
+        *   **Primary List (Threshold ≥ 0.7):** **77% Precision**, 10.5% Recall. For high-ROI, priority calling.
+        *   **Secondary List (Threshold ≥ 0.3):** **51% Precision**, 44.6% Recall. For data mining and experimental campaigns.
+
+5.  **Feature Importance Analysis:** Extracted and interpreted model coefficients to explain predictions.
+    ```python
+    feature_names = model_pipeline.named_steps['preprocessor'].get_feature_names_out()
+    coefficients = model_pipeline.named_steps['classifier'].coef_[0]
+    ```
+    *   **Key Drivers (Operational Model):**
+        *   **`emp_var_rate`** (-2.284): Higher employment variation reduces conversion.
+        *   **`cons_price_idx`** (+1.182): Higher consumer price index (inflation) increases conversion.
+        *   **`contacted_before`** (+0.273): Previous contact increases likelihood.
+
+6.  **Diagnostic Model Development:** Built and evaluated a second model including `duration` features to understand the full conversion journey.
+    ```python
+    # Include 'category' dtype to capture `duration_binned`
+    categorical_cols_diag = X_train_diag.select_dtypes(include=['object', 'category']).columns.tolist()
+    diag_pipeline = Pipeline(steps=[...])  # Same structure as operational pipeline
+    diag_pipeline.fit(X_train_diag, y_train_diag)
+    auc_diag = roc_auc_score(y_test_diag, diag_pipeline.predict_proba(X_test_diag)[:, 1])
+    ```
+    *   **Result:** **ROC-AUC = 0.941 (Excellent)**. A **14.0 percentage point improvement** over the operational model, highlighting the immense predictive value of call engagement data.
+
+7.  **Diagnostic Model Insights:** Compared feature importance between models.
+    *   **Finding:** Duration features (`duration_binned_<1min`, `duration_binned_>10min`, raw `duration`) dominated the top 20 features in the diagnostic model.
+    *   **Business Insight:** Once call engagement is known, macroeconomic factors become secondary. A successful conversation can overcome unfavorable external conditions.
+
+**Tools:** Python (Scikit-learn, Pandas, Matplotlib).
+
+**Key Learnings:**
+1.  **Pipeline construction** is essential for reproducible data preprocessing and modeling.
+2.  For imbalanced classification, **ROC-AUC and precision-recall curves** are more informative than accuracy.
+3.  The **precision-recall trade-off** enables strategic business decisions (e.g., tiered lead lists).
+4.  **Model interpretability** (via coefficients) is crucial for stakeholder buy-in and actionable insights.
+5.  **Dual-model strategy** successfully separated operational scoring (AUC 0.801) from diagnostic understanding (AUC 0.941), quantifying the value of engagement data.
+
+---
