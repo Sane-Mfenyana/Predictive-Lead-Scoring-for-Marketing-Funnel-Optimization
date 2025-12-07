@@ -273,3 +273,59 @@ A manual, reactive approach leads to inefficient spend and missed opportunities.
 4.  **Macro-economic indicators, particularly interest rates, have a dramatic impact on conversion rates**, validating the strategic value of the enriched dataset.
 
 ---
+## Step 5: Advanced Feature Engineering (Python)
+
+**Objective:** Create new, predictive features from the raw data and prepare the dataset for modeling by encoding categorical variables, handling special values, and splitting the data.
+
+**Actions Taken:**
+
+1.  **Binary Encoding for `pdays`:** Transformed the special value `999` (meaning "not previously contacted") into a business-logical binary feature.
+    ```python
+    df['contacted_before'] = (df['pdays'] != 999).astype(int)
+    ```
+    *   **Result:** 63.8% of leads were new (`contacted_before=0`). Returning leads (`contacted_before=1`) had a **16.01% conversion rate vs 8.83% for new leads**.
+
+2.  **Target Encoding for `poutcome`:** Replaced categorical values with their actual observed conversion rates, preserving the powerful predictive relationship discovered in EDA.
+    ```python
+    poutcome_encoding = df.groupby('poutcome')['y'].mean()
+    df['poutcome_encoded'] = df['poutcome'].map(poutcome_encoding)
+    ```
+    *   **Result:** Encoding mapped: `'failure'→0.142`, `'nonexistent'→0.088`, `'success'→0.651`. This captures the **7.4x conversion difference** between `success` and `nonexistent`.
+
+3.  **Binning `duration` for Diagnostic Model:** Created engagement-level categories from raw call duration for the diagnostic model.
+    ```python
+    df['duration_binned'] = pd.cut(df['duration']/60,
+                                   bins=[0, 1, 5, 10, float('inf')],
+                                   labels=['<1min', '1-5min', '5-10min', '>10min'])
+    ```
+    *   **Result:** Clear conversion gradient: **<1min: 0.0%, 1-5min: 5.9%, 5-10min: 18.6%, >10min: 48.6%**. Validates the 5-minute funnel threshold.
+
+4.  **Macro-Economic Indicator:** Created a binary feature from the `euribor3m` interest rate based on the median.
+    ```python
+    df['low_interest_env'] = (df['euribor3m'] < df['euribor3m'].median()).astype(int)
+    ```
+    *   **Result:** **18.5% conversion in low-interest environments vs 4.9% in high-interest environments**—a **3.77x difference** captured in a simple feature.
+
+5.  **Train-Test Split for Dual Models:** Prepared separate feature sets and performed stratified splits for the operational (no duration) and diagnostic (with duration) models.
+    ```python
+    from sklearn.model_selection import train_test_split
+    # Split for operational model (features without duration)
+    X_train_op, X_test_op, y_train_op, y_test_op = train_test_split(
+        X_without, y, test_size=0.2, random_state=42, stratify=y
+    )
+    # Split for diagnostic model (features with duration)
+    X_train_diag, X_test_diag, y_train_diag, y_test_diag = train_test_split(
+        X_with, y, test_size=0.2, random_state=42, stratify=y
+    )
+    ```
+    *   **Result:** Successful 80/20 stratified split for both models. Training sets: 32,950 rows (80.0%), Test sets: 8,238 rows (20.0%). Conversion rates consistent across splits (11.27% train, 11.26% test).
+
+**Tools:** Python (Pandas, Scikit-learn).
+
+**Key Learnings:**
+1.  Feature engineering transforms raw data into **business-meaningful signals** for the model.
+2.  **Target encoding** is powerful for high-cardinality categorical variables with a clear relationship to the target.
+3.  **Binning continuous variables** can help models capture non-linear relationships and business thresholds.
+4.  **Stratified sampling** is crucial for maintaining class distribution in train/test splits, especially with imbalanced data.
+
+---
