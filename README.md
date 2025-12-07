@@ -156,3 +156,120 @@ A manual, reactive approach leads to inefficient spend and missed opportunities.
 **Key Insight:** The largest funnel drop-off occurs at the engagement stage (only 27% of calls last >5 minutes). Improving this is the primary lever for increasing conversions.
 
 ---
+## Step 4: Exploratory Data Analysis - EDA (Python)
+
+**Objective:** Conduct a deeper, visual analysis of the dataset using Python to uncover patterns, relationships, and feature insights that will inform feature engineering and modeling.
+
+**Actions Taken:**
+
+1.  **Environment Setup & Data Extraction:** A Jupyter notebook was set up in Google Colab. The core data science libraries were imported, and authentication was established to securely extract the data from BigQuery.
+    ```python
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    sns.set_style("whitegrid")
+    from google.colab import auth
+    auth.authenticate_user()
+    project_id = 'your-project-id'
+    query = "SELECT * FROM `bank_marketing.bank_additional_full`"
+    df = pd.read_gbq(query, project_id=project_id)
+    ```
+    *   **Result:** Successfully loaded 41,188 rows and 21 columns into a pandas DataFrame.
+
+2.  **Data Quality & Structure Check:** Initial checks confirmed the data was clean and correctly typed.
+    ```python
+    print("Data Types:\n", df.dtypes)
+    print("\nMissing Values:\n", df.isnull().sum())
+    ```
+    *   **Finding:** Zero missing values. Target variable `y` correctly typed as `boolean`.
+
+3.  **Target Variable Distribution:** Visualized the class imbalance.
+    ```python
+    plt.figure(figsize=(6,4))
+    ax = sns.countplot(x='y', hue='y', data=df, palette='Set2', legend=False)
+    for container in ax.containers:
+        ax.bar_label(container, fmt='%.0f', label_type='edge')
+    plt.title('Distribution of Target Variable (y)')
+    plt.show()
+    print(f"Conversion Rate: {df['y'].mean()*100:.2f}%")
+    ```
+    *   **Finding:** **11.27% conversion rate** visually confirmed, highlighting the class imbalance.
+
+4.  **Marketing Funnel Visualization:** Quantified and visualized the three-stage funnel.
+    ```python
+    total_contacted = len(df)
+    engaged = len(df[df['duration'] >= 300])
+    converted = len(df[df['y'] == True])
+    funnel_data = pd.DataFrame({
+        'Stage': ['Contacted', 'Engaged (≥5 min)', 'Converted'],
+        'Count': [total_contacted, engaged, converted]
+    })
+    plt.figure(figsize=(8,6))
+    bars = plt.barh(funnel_data['Stage'], funnel_data['Count'], color=['skyblue', 'lightgreen', 'salmon'])
+    for bar, count in zip(bars, funnel_data['Count']):
+        width = bar.get_width()
+        plt.text(width/2, bar.get_y() + bar.get_height()/2, f'{int(count):,}\n({count/total_contacted*100:.1f}%)', ha='center', va='center', fontweight='bold')
+    plt.xlabel('Number of Leads')
+    plt.title('Marketing Funnel: Contact → Engagement → Conversion')
+    plt.gca().invert_yaxis()
+    plt.show()
+    ```
+    *   **Finding:** Funnel metrics matched SQL results: **27.31% engagement rate**, **41.24% engaged conversion rate**.
+
+5.  **Analyzing Key Predictor - Previous Outcome (`poutcome`):** Visualized the most powerful predictor.
+    ```python
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    sns.countplot(x='poutcome', data=df, ax=axes[0], palette='Blues')
+    axes[0].set_title('Number of Leads by Previous Outcome')
+    poutcome_rate = df.groupby('poutcome')['y'].mean() * 100
+    sns.barplot(x=poutcome_rate.index, y=poutcome_rate.values, ax=axes[1], palette='Reds')
+    axes[1].set_title('Conversion Rate by Previous Outcome')
+    axes[1].axhline(y=df['y'].mean()*100, color='black', linestyle='--', label='Overall Avg')
+    axes[1].legend()
+    plt.tight_layout()
+    plt.show()
+    ```
+    *   **Key Insight:** Clients with previous `success` convert at **65.11%**—**7.5x higher** than new leads (`nonexistent`, 8.83%).
+
+6.  **Call Duration Analysis:** Examined the relationship between call duration and conversion.
+    ```python
+    plt.figure(figsize=(10,6))
+    sns.histplot(df[df['y']==False]['duration']/60, bins=50, color='red', alpha=0.5, label='Not Converted', kde=True)
+    sns.histplot(df[df['y']==True]['duration']/60, bins=50, color='green', alpha=0.5, label='Converted', kde=True)
+    plt.axvline(x=5, color='black', linestyle='--', linewidth=2, label='5-min Threshold')
+    plt.xlabel('Call Duration (Minutes)')
+    plt.title('Distribution of Call Duration: Converted vs Not Converted')
+    plt.legend()
+    plt.xlim(0, 30)
+    plt.show()
+    ```
+    *   **Finding:** Converted calls average **9.2 minutes** vs 3.7 minutes for non-converted. **67.5% of successful calls exceeded the 5-minute threshold.**
+
+7.  **Socio-Economic Feature Analysis:** Explored the impact of the Euribor 3-month rate.
+    ```python
+    plt.figure(figsize=(10,6))
+    sns.scatterplot(x='euribor3m', y='y', data=df, alpha=0.05, color='blue')
+    sns.regplot(x='euribor3m', y='y', data=df, logistic=True, scatter=False, color='red', line_kws={'linewidth': 3})
+    plt.xlabel('Euribor 3 Month Rate (%)')
+    plt.ylabel('Conversion (True/False)')
+    plt.title('Relationship Between Interest Rates and Conversion')
+    plt.yticks([0, 1], ['No (0)', 'Yes (1)'])
+    plt.show()
+    median_rate = df['euribor3m'].median()
+    low_rate_conv = df[df['euribor3m'] < median_rate]['y'].mean() * 100
+    high_rate_conv = df[df['euribor3m'] >= median_rate]['y'].mean() * 100
+    print(f"Low Euribor (< {median_rate:.2f}%): {low_rate_conv:.2f}% conversion")
+    print(f"High Euribor (≥ {median_rate:.2f}%): {high_rate_conv:.2f}% conversion")
+    ```
+    *   **Critical Business Insight:** Conversion is **3.75x higher** in low interest-rate environments (**18.52%** vs **4.94%**). Macroeconomic conditions significantly impact campaign success.
+
+**Tools:** Python (Pandas, NumPy, Matplotlib, Seaborn), Google Colab, BigQuery.
+
+**Key Learnings:**
+1.  Visual analysis confirmed and enriched all SQL findings.
+2.  The `poutcome` feature is the single strongest predictor of conversion.
+3.  Call duration has a clear relationship with success but cannot be used for prospective lead scoring.
+4.  **Macro-economic indicators, particularly interest rates, have a dramatic impact on conversion rates**, validating the strategic value of the enriched dataset.
+
+---
