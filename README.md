@@ -412,3 +412,70 @@ A manual, reactive approach leads to inefficient spend and missed opportunities.
 5.  **Dual-model strategy** successfully separated operational scoring (AUC 0.801) from diagnostic understanding (AUC 0.941), quantifying the value of engagement data.
 
 ---
+## Step 7: Dashboard Design & Planning (Tableau)
+
+**Objective:** Plan and prepare the data sources for an interactive Tableau dashboard that will operationalize the model insights for business users.
+
+**Actions Taken:**
+
+1.  **Dashboard Structure Design:** Defined a four-panel dashboard layout to tell a complete data story:
+    *   **Panel 1 - Funnel Performance:** Visualizes the marketing funnel stages and drop-off rates.
+    *   **Panel 2 - Lead Prioritization:** Provides an interactive, sortable list of leads with model scores and recommended actions.
+    *   **Panel 3 - Conversion Drivers:** Displays the feature importance from the model, explaining *why* leads score highly.
+    *   **Panel 4 - Campaign Performance:** Tracks conversion rates over time and by segment.
+
+2.  **Lead Scoring Dataset Creation:** Generated the primary dataset for the dashboard by augmenting the original test data with model predictions and business logic.
+    ```python
+    # Merge original data with model predictions
+    test_indices = X_test_op.index
+    original_test_data = df.loc[test_indices].copy()
+    original_test_data['predicted_probability'] = y_pred_proba * 100
+
+    # Apply business rules for prioritization
+    original_test_data['priority'] = original_test_data['predicted_probability'].apply(
+        lambda prob: 'High' if prob >= 70 else ('Medium' if prob >= 30 else 'Low')
+    )
+
+    # Generate human-readable reasons for the score
+    original_test_data['key_reason'] = original_test_data.apply(get_key_reason, axis=1)
+    lead_scores = original_test_data[selected_columns].to_csv('lead_scores.csv', index=False)
+    ```
+    *   **Result:** Created `lead_scores.csv` (8,238 rows × 13 columns). Contains predicted probability (0-100%), priority tier (High/Medium/Low), key conversion reason, and essential lead attributes.
+
+3.  **Feature Importance Dataset:** Extracted and cleaned model coefficients to explain predictions.
+    ```python
+    feature_importance = pd.DataFrame({
+        'feature': feature_names,
+        'coefficient': coefficients
+    })
+    # Clean feature names for readability
+    feature_importance['feature_clean'] = feature_importance['feature'].str.replace('remainder__', '').str.replace('cat__', '')
+    feature_importance.to_csv('feature_importance.csv', index=False)
+    ```
+    *   **Result:** Created `feature_importance.csv`. Enables the "Conversion Drivers" panel, showing that `emp_var_rate`, `cons_price_idx`, and duration features are top influencers.
+
+4.  **Threshold Analysis Dataset:** Pre-calculated precision and recall metrics across a range of probability thresholds to enable interactive exploration.
+    ```python
+    thresholds_to_test = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    threshold_data = []
+    for thresh in thresholds_to_test:
+        y_pred_thresh = (y_pred_proba >= thresh)
+        threshold_data.append({
+            'threshold': thresh,
+            'precision': precision_score(y_test_op, y_pred_thresh),
+            'recall': recall_score(y_test_op, y_pred_thresh),
+            'n_leads': sum(y_pred_thresh)
+        })
+    pd.DataFrame(threshold_data).to_csv('threshold_metrics.csv', index=False)
+    ```
+    *   **Result:** Created `threshold_metrics.csv`. Allows dashboard users to adjust the scoring threshold via a slider and see the corresponding impact on lead volume (recall) and accuracy (precision).
+
+**Tools:** Python (Pandas), CSV.
+
+**Key Learnings:**
+1.  Dashboard design must start with **user stories and business questions**, not just available charts.
+2.  **Pre-computing data** in Python is often necessary for complex, model-driven dashboards in Tableau.
+3.  A successful dashboard requires **multiple, related datasets** (scores, explanations, performance metrics) that work together.
+4.  Adding **business logic layers** (priority tiers, key reasons) on top of raw model scores is crucial for user adoption.
+
+---
