@@ -1,5 +1,27 @@
 # Predictive Lead Scoring for Marketing Funnel Optimization
 
+## 🎯 Executive Summary
+- **Built a predictive lead scoring model** with **77% precision** to identify high-conversion leads, enabling sales teams to prioritize calls with **6x higher expected conversion rates**.
+- **Discovered that macroeconomic factors** (interest rates, employment variation) impact conversion **3.8x more than customer demographics**, providing a strategic lever for campaign timing.
+- **Delivered an interactive Tableau dashboard** that operationalizes model insights into daily sales workflows, transforming raw data into actionable business intelligence.
+
+## 📐 Project Architecture
+```mermaid
+graph TD
+    A[GCP BigQuery<br/>Data Warehouse] --> B[Python / Colab<br/>EDA & Feature Engineering]
+    B --> C[Scikit-learn<br/>Predictive Modeling]
+    C --> D[Tableau<br/>Interactive Dashboard]
+    D --> E[Business Stakeholders<br/>Sales & Marketing Teams]
+    
+    style A fill:#e1f5fe,color:#000
+    style B fill:#f3e5f5,color:#000
+    style C fill:#e8f5e8,color:#000
+    style D fill:#fff3e0,color:#000
+    style E fill:#fce4ec,color:#000
+    
+    linkStyle default fill:none,stroke:#333
+```
+
 ## Project Description
 This end-to-end analytics project addresses a core challenge in FinTech marketing: inefficient lead prioritization. By analyzing an enriched customer interaction dataset, I developed a machine learning model to predict conversion likelihood and built an interactive Tableau dashboard for funnel visualization. The project demonstrates the full commercial analytics lifecycle—from SQL data wrangling and exploratory analysis to predictive modeling and business intelligence—showcasing how data science directly informs strategic marketing spend and customer acquisition strategy.
 
@@ -484,12 +506,48 @@ A manual, reactive approach leads to inefficient spend and missed opportunities.
     ```
     *   **Result:** Created `threshold_metrics.csv`. Allows dashboard users to adjust the scoring threshold via a slider and see the corresponding impact on lead volume (recall) and accuracy (precision).
 
-**Tools:** Python (Pandas), CSV.
-
-**Key Learnings:**
-1.  Dashboard design must start with **user stories and business questions**, not just available charts.
-2.  **Pre-computing data** in Python is often necessary for complex, model-driven dashboards in Tableau.
-3.  A successful dashboard requires **multiple, related datasets** (scores, explanations, performance metrics) that work together.
-4.  Adding **business logic layers** (priority tiers, key reasons) on top of raw model scores is crucial for user adoption.
-
 ---
+## Step 8: Dashboard Design & Planning (Tableau)
+
+**Objective:** Plan and prepare the data sources for an interactive Tableau dashboard that will operationalize the model insights for business users.
+
+**Actions Taken:**
+Designed a four-panel dashboard where each visualization answers a specific business question and is powered by curated datasets exported from the Python analysis.
+
+### Panel 1: Marketing Funnel Performance
+*   **In plain terms:** This chart acts as a campaign health monitor, showing where potential customers are lost in the sales process.
+*   **Technical evidence:** The horizontal bar funnel quantifies the severe drop-off at the engagement stage: only **27.3%** of contacted leads have a meaningful conversation (≥5 min).
+*   **Implication:** The primary focus for improving sales should be on **improving call quality and agent scripting** to cross the 5-minute engagement threshold, not just increasing lead volume.
+
+<img width="858" height="180" alt="Funnel" src="https://github.com/user-attachments/assets/b010b776-6b2c-4cec-9a75-ca725869120e" />
+
+[Marketing Funnel]
+
+
+### Panel 2: Prioritized Lead List
+*   **In plain terms:** This is the sales team's daily "playbook," providing a clear, sortable list of who to call, in what order, and why.
+*   **Technical evidence:** The list is powered by the operational model. Leads in the **"High Priority"** tier have an average predicted conversion probability **>70%**, compared to the campaign average of 11.3%.
+*   **Implication:** Sales agents can **stop cold-calling randomly**. By starting with the "High Priority" list, they can expect a **~6x higher conversion rate**, maximizing daily efficiency and ROI.
+  
+ <img width="842" height="527" alt="Lead List" src="https://github.com/user-attachments/assets/4efac1af-9438-4803-9079-0d4bd1e6072d" />
+  
+[Prioritized Lead List]
+
+
+### Panel 3: Key Conversion Drivers
+*   **In plain terms:** This chart explains the "why" behind the model's scores, revealing what factors most influence a lead's likelihood to convert.
+*   **Technical evidence:** The horizontal bar chart displays model coefficients, showing **`emp_var_rate` (employment variation)** as the strongest negative driver and **`cons_price_idx` (inflation)** as a key positive driver.
+*   **Implication:** Marketing strategy must account for **macroeconomic timing**. Campaigns launched during periods of economic stability and higher inflation are likely to see significantly higher baseline conversion rates.
+   
+ <img width="858" height="442" alt="Feature Importance" src="https://github.com/user-attachments/assets/18246ef7-5780-471d-b947-2080858c41fb" />
+    
+[Key Conversion Drivers]
+
+### Panel 4: Precision-Recall Trade-off
+*   **In plain terms:** This interactive tool allows managers to strategically adjust how "picky" the model is when scoring leads.
+*   **Technical evidence:** The curve plots the fundamental trade-off: increasing the probability threshold improves **precision** (lead quality) but reduces **recall** (lead volume). The default threshold of 0.7 achieves **~77% precision**.
+*   **Implication:** Managers can **dynamically allocate sales resources**. A high threshold optimizes for agent productivity; a lower threshold fills call sheets for larger teams, allowing strategic balance between quality and quantity.
+  
+ <img width="859" height="519" alt="Trade-Off Chart" src="https://github.com/user-attachments/assets/bc4e300a-b596-4cae-a446-3cc8c6f3b6a4" />
+
+[Precision-Recall Trade-off]
