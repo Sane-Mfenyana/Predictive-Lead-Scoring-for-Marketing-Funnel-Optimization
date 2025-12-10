@@ -5,7 +5,8 @@ This end-to-end analytics project addresses a core challenge in FinTech marketin
 
 ## 📊 Live Dashboard
 
-![Predictive Lead Scoring Dashboard](dashboard_screenshot.png)
+<img width="992" height="799" alt="Dashboard screenshot" src="https://github.com/user-attachments/assets/6ed3cf99-5446-4ec3-be2f-8a76eb3f1f56" />
+[Predictive Lead Scoring Dashboard]
 
 **Access the interactive dashboard:** [Tableau Public Link](https://public.tableau.com/views/LeadScoring-MarketingFunnelOptimisation_/LeadScoringDashboard?:language=en-GB&:sid=&:display_count=n&:origin=viz_share_link)
 
