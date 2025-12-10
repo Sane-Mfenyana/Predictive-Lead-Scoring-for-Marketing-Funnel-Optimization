@@ -3,6 +3,13 @@
 ## Project Description
 This end-to-end analytics project addresses a core challenge in FinTech marketing: inefficient lead prioritization. By analyzing an enriched customer interaction dataset, I developed a machine learning model to predict conversion likelihood and built an interactive Tableau dashboard for funnel visualization. The project demonstrates the full commercial analytics lifecycle—from SQL data wrangling and exploratory analysis to predictive modeling and business intelligence—showcasing how data science directly informs strategic marketing spend and customer acquisition strategy.
 
+## 📊 Live Dashboard
+[![Tableau Dashboard](https://img.shields.io/badge/Tableau-Public-blue)](https://public.tableau.com/views/LeadScoring-MarketingFunnelOptimisation_/LeadScoringDashboard?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link)
+
+Access the interactive dashboard here: [Predictive Lead Scoring Dashboard](https://public.tableau.com/views/LeadScoring-MarketingFunnelOptimisation_/LeadScoringDashboard?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link)
+
+*Note: Allow a few seconds for the dashboard to load completely.*
+
 ## Business Problem
 A financial institution's telemarketing campaign aims to sell term deposit products. The marketing team needs to:
 1.  **Understand** the customer journey and identify key drop-off points in the marketing funnel.
