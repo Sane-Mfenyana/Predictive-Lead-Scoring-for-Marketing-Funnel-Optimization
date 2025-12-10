@@ -52,7 +52,7 @@ graph TD
 <img width="992" height="799" alt="Dashboard screenshot" src="https://github.com/user-attachments/assets/6ed3cf99-5446-4ec3-be2f-8a76eb3f1f56" />
 [Predictive Lead Scoring Dashboard]
 
-**Access the interactive dashboard:** [Tableau Public Link](https://public.tableau.com/views/LeadScoring-MarketingFunnelOptimisation_/LeadScoringDashboard?:language=en-GB&:sid=&:display_count=n&:origin=viz_share_link)
+**Access the interactive dashboard:** [Tableau Public - Lead Scoring Dashboard](https://public.tableau.com/views/LeadScoring-MarketingFunnelOptimisation_/LeadScoringDashboard?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link)
 
 *Features:*
 - **Funnel Analysis:** Visualize campaign performance
@@ -73,12 +73,21 @@ A manual, reactive approach leads to inefficient spend and missed opportunities.
 
 ## Repository Structure
 ```
-├── /sql/ # BigQuery SQL scripts for data preparation
-├── /notebooks/ # Jupyter Notebook for EDA & modelling
-├── /dashboard/ # Tableau workbook and related assets
-├── /docs/ # Project summary and presentation
-└── README.md # This file
+├── /sql/              # BigQuery SQL scripts for data preparation
+├── /notebooks/        # Jupyter Notebook for EDA & modelling
+├── /dashboard/        # Tableau workbook and related assets
+├── /docs/             # Project summary and presentation
+├── requirements.txt   # Python package dependencies
+└── README.md          # This file
 ```
+---
+## 🔧 Skills Demonstrated
+- **📊 Data Analysis:** SQL, Python (Pandas, NumPy), Statistical Testing
+- **🤖 Machine Learning:** Scikit-learn, Logistic Regression, Model Evaluation
+- **📈 Visualization:** Tableau, Matplotlib, Seaborn, Dashboard Design
+- **☁️ Cloud Platforms:** Google Cloud Platform, BigQuery
+- **💼 Business Strategy:** Funnel Analysis, KPI Development, ROI Calculation
+
 ---
 
 ## Step 1: Project Setup & Data Ingestion
@@ -90,6 +99,8 @@ A manual, reactive approach leads to inefficient spend and missed opportunities.
 3.  **Data Pipeline:** Created a BigQuery dataset named `bank_marketing` and uploaded the enriched `bank-additional.csv` file as the primary table, `bank_additional_full`.
 
 **Tools:** GitHub, Google Cloud Platform Console, BigQuery.
+
+---
 
 ## Step 2: Data Discovery & Quality Check (SQL)
 
@@ -216,6 +227,7 @@ A manual, reactive approach leads to inefficient spend and missed opportunities.
 **Key Insight:** The largest funnel drop-off occurs at the engagement stage (only 27% of calls last >5 minutes). Improving this is the primary lever for increasing conversions.
 
 ---
+
 ## Step 4: Exploratory Data Analysis - EDA (Python)
 
 **Objective:** Conduct a deeper, visual analysis of the dataset using Python to uncover patterns, relationships, and feature insights that will inform feature engineering and modeling.
@@ -333,6 +345,7 @@ A manual, reactive approach leads to inefficient spend and missed opportunities.
 4.  **Macro-economic indicators, particularly interest rates, have a dramatic impact on conversion rates**, validating the strategic value of the enriched dataset.
 
 ---
+
 ## Step 5: Advanced Feature Engineering (Python)
 
 **Objective:** Create new, predictive features from the raw data and prepare the dataset for modeling by encoding categorical variables, handling special values, and splitting the data.
@@ -389,6 +402,7 @@ A manual, reactive approach leads to inefficient spend and missed opportunities.
 4.  **Stratified sampling** is crucial for maintaining class distribution in train/test splits, especially with imbalanced data.
 
 ---
+
 ## Step 6: Predictive Model Development (Python)
 
 **Objective:** Build, train, and evaluate machine learning models to predict lead conversion probability, implementing both operational and diagnostic models as defined in the project strategy.
@@ -472,6 +486,7 @@ A manual, reactive approach leads to inefficient spend and missed opportunities.
 5.  **Dual-model strategy** successfully separated operational scoring (AUC 0.801) from diagnostic understanding (AUC 0.941), quantifying the value of engagement data.
 
 ---
+
 ## Step 7: Dashboard Design & Planning (Tableau)
 
 **Objective:** Plan and prepare the data sources for an interactive Tableau dashboard that will operationalize the model insights for business users.
@@ -531,6 +546,7 @@ A manual, reactive approach leads to inefficient spend and missed opportunities.
     *   **Result:** Created `threshold_metrics.csv`. Allows dashboard users to adjust the scoring threshold via a slider and see the corresponding impact on lead volume (recall) and accuracy (precision).
 
 ---
+
 ### Panel 1: Marketing Funnel Performance
 *   **In plain terms:** This chart acts as a campaign health monitor, showing where potential customers are lost in the sales process.
 *   **Technical evidence:** The horizontal bar funnel quantifies the severe drop-off at the engagement stage: only **27.3%** of contacted leads have a meaningful conversation (≥5 min).
