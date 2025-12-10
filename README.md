@@ -1,9 +1,34 @@
 # Predictive Lead Scoring for Marketing Funnel Optimization
 
-## 🎯 Executive Summary
-- **Built a predictive lead scoring model** with **77% precision** to identify high-conversion leads, enabling sales teams to prioritize calls with **6x higher expected conversion rates**.
-- **Discovered that macroeconomic factors** (interest rates, employment variation) impact conversion **3.8x more than customer demographics**, providing a strategic lever for campaign timing.
-- **Delivered an interactive Tableau dashboard** that operationalizes model insights into daily sales workflows, transforming raw data into actionable business intelligence.
+## 🚀 Executive Summary & Business Impact
+
+### The Challenge
+Inefficient lead prioritization was wasting marketing spend in telemarketing campaigns, with agents cold-calling leads that converted at only **11.3%**.
+
+### The Solution
+Developed an end-to-end predictive analytics solution that scores leads by conversion probability, enabling data-driven prioritization. The operational model achieves **77% precision** for high-priority leads.
+
+### Key Discovery
+**Macroeconomic factors are primary conversion drivers:** Campaigns in low-interest-rate environments see **3.8x higher conversion rates** than during high-interest periods. Economic indicators (`emp_var_rate`, `cons_price_idx`) proved more predictive than customer demographics.
+
+### Quantifiable Impact
+- **6x higher conversion rates** on "High Priority" leads compared to random calling
+- **41.2% conversion rate** once leads are properly engaged (≥5 minute calls)
+- **14.0 percentage point AUC improvement** when including engagement data, quantifying the value of quality conversations
+
+### Strategic Recommendations
+1.  **Re-engage past successful customers first** - They convert at **65.1%** (7.4x baseline)
+2.  **Time campaigns with economic indicators** - Launch in periods of low `euribor3m (interest rate)` and stable employment
+3.  **Train agents to reach the 5-minute threshold** - This doubles the engaged lead pool
+4.  **Adopt a tiered outreach system** - Use model scores to create High/Medium/Low priority lists for optimal resource allocation
+
+### Technology Stack
+`SQL (BigQuery)` | `Python (Pandas, Scikit-learn)` | `Tableau` | `Google Cloud Platform`
+
+---
+
+## Project Description
+This end-to-end analytics project addresses a core challenge in FinTech marketing: inefficient lead prioritization. By analyzing an enriched customer interaction dataset, I developed a machine learning model to predict conversion likelihood and built an interactive Tableau dashboard for funnel visualization. The project demonstrates the full commercial analytics lifecycle—from SQL data wrangling and exploratory analysis to predictive modeling and business intelligence—showcasing how data science directly informs strategic marketing spend and customer acquisition strategy.
 
 ## 📐 Project Architecture
 ```mermaid
@@ -22,9 +47,6 @@ graph TD
     linkStyle default fill:none,stroke:#333
 ```
 
-## Project Description
-This end-to-end analytics project addresses a core challenge in FinTech marketing: inefficient lead prioritization. By analyzing an enriched customer interaction dataset, I developed a machine learning model to predict conversion likelihood and built an interactive Tableau dashboard for funnel visualization. The project demonstrates the full commercial analytics lifecycle—from SQL data wrangling and exploratory analysis to predictive modeling and business intelligence—showcasing how data science directly informs strategic marketing spend and customer acquisition strategy.
-
 ## 📊 Live Dashboard
 
 <img width="992" height="799" alt="Dashboard screenshot" src="https://github.com/user-attachments/assets/6ed3cf99-5446-4ec3-be2f-8a76eb3f1f56" />
@@ -38,6 +60,8 @@ This end-to-end analytics project addresses a core challenge in FinTech marketin
 - **Conversion Drivers:** Model insights on key factors
 - **Threshold Control:** Adjust precision/recall trade-off
 *Note: Allow a few seconds for the dashboard to load completely.*
+
+**Data Note:** The dashboard visualizes predictions from a static model snapshot. In a production environment, this would connect to a live database with automated scoring pipelines.
 
 ## Business Problem
 A financial institution's telemarketing campaign aims to sell term deposit products. The marketing team needs to:
@@ -526,7 +550,7 @@ A manual, reactive approach leads to inefficient spend and missed opportunities.
 *   **Technical evidence:** The horizontal bar chart displays model coefficients, showing **`emp_var_rate` (employment variation)** as the strongest negative driver and **`cons_price_idx` (inflation)** as a key positive driver.
 *   **Implication:** Marketing strategy must account for **macroeconomic timing**. Campaigns launched during periods of economic stability and higher inflation are likely to see significantly higher baseline conversion rates.
 *   **Dashboard Viz:**
-    ![Key Conversion Drivers](images/feature_importance.png)
+    ![Key Conversion Drivers](images/key_conversion_drivers.png)
 
 ### Panel 4: Precision-Recall Trade-off
 *   **In plain terms:** This interactive tool allows managers to strategically adjust how "picky" the model is when scoring leads.
