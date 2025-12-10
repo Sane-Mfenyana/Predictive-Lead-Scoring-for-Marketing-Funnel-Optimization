@@ -507,47 +507,30 @@ A manual, reactive approach leads to inefficient spend and missed opportunities.
     *   **Result:** Created `threshold_metrics.csv`. Allows dashboard users to adjust the scoring threshold via a slider and see the corresponding impact on lead volume (recall) and accuracy (precision).
 
 ---
-## Step 8: Dashboard Design & Planning (Tableau)
-
-**Objective:** Plan and prepare the data sources for an interactive Tableau dashboard that will operationalize the model insights for business users.
-
-**Actions Taken:**
-Designed a four-panel dashboard where each visualization answers a specific business question and is powered by curated datasets exported from the Python analysis.
-
 ### Panel 1: Marketing Funnel Performance
 *   **In plain terms:** This chart acts as a campaign health monitor, showing where potential customers are lost in the sales process.
 *   **Technical evidence:** The horizontal bar funnel quantifies the severe drop-off at the engagement stage: only **27.3%** of contacted leads have a meaningful conversation (≥5 min).
 *   **Implication:** The primary focus for improving sales should be on **improving call quality and agent scripting** to cross the 5-minute engagement threshold, not just increasing lead volume.
-
-<img width="858" height="180" alt="Funnel" src="https://github.com/user-attachments/assets/b010b776-6b2c-4cec-9a75-ca725869120e" />
-
-[Marketing Funnel]
-
+*   **Dashboard Viz:**
+    ![Marketing Funnel](images/funnel.png)
 
 ### Panel 2: Prioritized Lead List
 *   **In plain terms:** This is the sales team's daily "playbook," providing a clear, sortable list of who to call, in what order, and why.
 *   **Technical evidence:** The list is powered by the operational model. Leads in the **"High Priority"** tier have an average predicted conversion probability **>70%**, compared to the campaign average of 11.3%.
 *   **Implication:** Sales agents can **stop cold-calling randomly**. By starting with the "High Priority" list, they can expect a **~6x higher conversion rate**, maximizing daily efficiency and ROI.
-  
- <img width="842" height="527" alt="Lead List" src="https://github.com/user-attachments/assets/4efac1af-9438-4803-9079-0d4bd1e6072d" />
-  
-[Prioritized Lead List]
-
+*   **Dashboard Viz:**
+    ![Prioritized Lead List](images/lead_list.png)
 
 ### Panel 3: Key Conversion Drivers
 *   **In plain terms:** This chart explains the "why" behind the model's scores, revealing what factors most influence a lead's likelihood to convert.
 *   **Technical evidence:** The horizontal bar chart displays model coefficients, showing **`emp_var_rate` (employment variation)** as the strongest negative driver and **`cons_price_idx` (inflation)** as a key positive driver.
 *   **Implication:** Marketing strategy must account for **macroeconomic timing**. Campaigns launched during periods of economic stability and higher inflation are likely to see significantly higher baseline conversion rates.
-   
- <img width="858" height="442" alt="Feature Importance" src="https://github.com/user-attachments/assets/18246ef7-5780-471d-b947-2080858c41fb" />
-    
-[Key Conversion Drivers]
+*   **Dashboard Viz:**
+    ![Key Conversion Drivers](images/feature_importance.png)
 
 ### Panel 4: Precision-Recall Trade-off
 *   **In plain terms:** This interactive tool allows managers to strategically adjust how "picky" the model is when scoring leads.
 *   **Technical evidence:** The curve plots the fundamental trade-off: increasing the probability threshold improves **precision** (lead quality) but reduces **recall** (lead volume). The default threshold of 0.7 achieves **~77% precision**.
 *   **Implication:** Managers can **dynamically allocate sales resources**. A high threshold optimizes for agent productivity; a lower threshold fills call sheets for larger teams, allowing strategic balance between quality and quantity.
-  
- <img width="859" height="519" alt="Trade-Off Chart" src="https://github.com/user-attachments/assets/bc4e300a-b596-4cae-a446-3cc8c6f3b6a4" />
-
-[Precision-Recall Trade-off]
+*   **Dashboard Viz:**
+    ![Precision-Recall Trade-off](images/trade_off_chart.png)
