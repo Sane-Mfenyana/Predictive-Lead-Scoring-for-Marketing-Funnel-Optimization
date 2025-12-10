@@ -1,5 +1,9 @@
 # Predictive Lead Scoring for Marketing Funnel Optimization
 
+![Status](https://img.shields.io/badge/Status-Complete-success)
+![License](https://img.shields.io/badge/License-MIT-blue)
+![GitHub Last Commit](https://img.shields.io/github/last-commit/Sane-Mfenyana/Predictive-Lead-Scoring-for-Marketing-Funnel-Optimization)
+
 ## 🚀 Executive Summary & Business Impact
 
 ### The Challenge
@@ -73,12 +77,15 @@ A manual, reactive approach leads to inefficient spend and missed opportunities.
 
 ## Repository Structure
 ```
-├── /sql/              # BigQuery SQL scripts for data preparation
-├── /notebooks/        # Jupyter Notebook for EDA & modelling
-├── /dashboard/        # Tableau workbook and related assets
-├── /docs/             # Project summary and presentation
-├── requirements.txt   # Python package dependencies
-└── README.md          # This file
+├── /images/           # Dashboard visualization screenshots
+│   ├── Funnel.png
+│   ├── Lead List.png
+│   ├── Key Conversion Drivers.png
+│   └── Trade-Off Chart.png
+├── .gitignore
+├── LICENSE
+├── README.md
+└── requirements.txt
 ```
 ---
 ## 🔧 Skills Demonstrated
